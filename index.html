@@ -1,0 +1,659 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Going on a Holiday</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout concept: a holiday passport. Home is a passport page with four country stamps; each trip is a postcard to read once, then a dashed dictation sheet to fill in from memory. */
+:root{
+  --bg:#FFEEF5; --surface:#FFFFFF; --ink:#1F1A2B; --muted:#5F5873; --line:#1F1A2B; --focus:#0B63C9;
+  --pink:#FF4FA3; --lime:#B8F12B; --yellow:#FFD21F; --sky:#22C7F5; --orange:#FF9A1F; --violet:#B36BFF;
+  --tile-ink:#1F1A2B; --paper:#FFFFFF; --paper-ink:#1F1A2B; --shadow:rgba(31,26,43,.22);
+  --p-ok:#0E7A4B; --p-ok-bg:#C9F5DD; --p-no:#C9223F; --p-no-bg:#FFD3DC; --p-warn:#A85500; --p-warn-bg:#FFE7BF; --p-select:#FFF3B8;
+  --good-fg:#0B5F3B; --good-bg:#D5F5E4; --bad-fg:#9E1B34; --bad-bg:#FFDDE4; --warn-fg:#7A3E00; --warn-bg:#FFE9C7;
+  --star:#FFB800;
+  --font-display:'Fredoka','Trebuchet MS','Comic Sans MS',sans-serif;
+  --font-body:'Nunito','Trebuchet MS',Verdana,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17121F; --surface:#241C33; --ink:#F7F2FF; --muted:#BDB3D1; --line:#B9ACD9; --focus:#7DD3FF; --shadow:rgba(0,0,0,.55);
+    --good-fg:#7CF0B7; --good-bg:#12362A; --bad-fg:#FF9DB0; --bad-bg:#3E1A25; --warn-fg:#FFC878; --warn-bg:#3A2A10;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17121F; --surface:#241C33; --ink:#F7F2FF; --muted:#BDB3D1; --line:#B9ACD9; --focus:#7DD3FF; --shadow:rgba(0,0,0,.55);
+  --good-fg:#7CF0B7; --good-bg:#12362A; --bad-fg:#FF9DB0; --bad-bg:#3E1A25; --warn-fg:#FFC878; --warn-bg:#3A2A10;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font:700 clamp(16px,2.4vw,18px)/1.5 var(--font-body);
+  padding-block:20px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+button,select{font-family:inherit}
+:focus-visible{outline:4px solid var(--focus);outline-offset:3px}
+
+/* hero */
+.hero{display:grid;gap:12px;padding-block:6px 4px}
+.title{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;margin:0}
+.word{display:flex;gap:5px}
+.tile{display:grid;place-items:center;width:clamp(34px,8vw,58px);aspect-ratio:1;border:3px solid var(--tile-ink);
+  border-radius:12px 8px 12px 9px/9px 12px 8px 12px;font:700 clamp(22px,5.4vw,40px)/1 var(--font-display);color:var(--tile-ink);background:var(--t)}
+.tile:nth-child(odd){transform:rotate(-3deg)}
+.tile:nth-child(even){transform:rotate(2.5deg)}
+.small{font:500 italic clamp(22px,4.4vw,32px)/1 var(--font-display);padding-bottom:6px}
+.lead{font:500 clamp(20px,3.6vw,26px)/1.4 var(--font-display);max-width:34em}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;list-style:none;padding:0;margin:22px 0}
+.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:3px solid var(--line);border-radius:16px;padding:12px 14px;min-width:0}
+.steps .n{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--yellow);color:var(--tile-ink);border:3px solid var(--tile-ink);font:700 18px/1 var(--font-display)}
+
+/* passport */
+.passport{background:var(--surface);border:3px solid var(--line);border-radius:22px;padding:clamp(14px,3vw,24px)}
+.passport-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;margin-bottom:16px}
+.passport h2{font:700 clamp(24px,5vw,32px)/1.1 var(--font-display)}
+.count{color:var(--muted)}
+.stamps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stamp{position:relative;appearance:none;-webkit-appearance:none;font:inherit;color:var(--ink);cursor:pointer;background:transparent;
+  border:3px dashed var(--line);border-radius:18px;padding:14px 10px 12px;display:grid;justify-items:center;gap:6px;min-width:0;text-align:center}
+.stamp:hover{border-style:solid;border-color:var(--c)}
+.stamp .s-name{font:700 24px/1.1 var(--font-display)}
+.stamp .s-state{color:var(--muted);font-size:15px}
+.badge{position:absolute;top:8px;right:6px;transform:rotate(12deg);border:3px solid var(--good-fg);color:var(--good-fg);border-radius:8px;
+  padding:0 7px;font:700 13px/1.5 var(--font-display);letter-spacing:.08em;text-transform:uppercase;background:var(--surface)}
+.art-wrap{width:96px;height:96px;border-radius:50%;border:3px solid var(--tile-ink);overflow:hidden;background:#fff;flex:none}
+.art-wrap svg{display:block;width:100%;height:100%}
+
+.teacher{margin-top:20px;background:var(--surface);border:3px solid var(--line);border-radius:16px;padding:10px 14px}
+.teacher summary{cursor:pointer;font:600 18px var(--font-display)}
+.cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:12px;align-items:end}
+.cfg label{display:grid;gap:4px;font-size:15px;color:var(--muted)}
+.cfg select{font:700 17px var(--font-body);padding:8px 10px;border:3px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.foot{margin-top:22px;color:var(--muted);font-size:14px}
+
+/* buttons */
+.btn{appearance:none;-webkit-appearance:none;font:700 clamp(17px,3.4vw,20px)/1.1 var(--font-display);border:3px solid var(--tile-ink);border-radius:14px;
+  padding:12px 20px;min-height:52px;cursor:pointer;background:var(--pink);color:var(--tile-ink);box-shadow:0 4px 0 var(--tile-ink);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--tile-ink)}
+.btn.alt{background:var(--yellow)}
+.btn.good{background:var(--lime)}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:0 4px 0 var(--line)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;align-items:center}
+.back{appearance:none;background:none;border:0;color:var(--ink);font:700 17px var(--font-body);cursor:pointer;text-decoration:underline;text-underline-offset:4px;padding:8px 4px}
+
+.topbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--surface);border:3px solid var(--line);border-radius:999px;padding:3px 12px;font:700 15px var(--font-body)}
+.screen-title{font:700 clamp(26px,5.5vw,38px)/1.1 var(--font-display);margin-bottom:6px}
+.hint{color:var(--muted);margin-bottom:16px;max-width:40em}
+
+/* postcard */
+.card{background:var(--c);border:5px solid var(--paper-ink);border-radius:18px 10px 20px 12px/12px 20px 10px 18px;padding:clamp(10px,2.5vw,16px);box-shadow:6px 6px 0 var(--shadow)}
+.card-inner{background:var(--paper);color:var(--paper-ink);border:4px solid var(--paper-ink);border-radius:12px 18px 10px 20px/18px 10px 20px 12px;padding:clamp(14px,3.5vw,26px)}
+.card-head{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.card-head h3{font:700 clamp(32px,8vw,52px)/1 var(--font-display);letter-spacing:.01em}
+.card-text{font:500 clamp(21px,4.6vw,30px)/1.6 var(--font-display)}
+.card.leaving{animation:away .38s ease-in forwards}
+@keyframes away{to{transform:scale(.8) rotate(-6deg) translateY(-30px);opacity:0}}
+
+/* dictation sheet */
+.sheet{background:var(--paper);color:var(--paper-ink);border:4px solid var(--paper-ink);border-radius:20px;padding:clamp(12px,3vw,22px);box-shadow:6px 6px 0 var(--shadow)}
+.sheet-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;font:600 clamp(19px,4vw,24px)/1.3 var(--font-display)}
+.sheet-top .q{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dict{border:3px dashed var(--paper-ink);border-radius:14px;padding:clamp(12px,3vw,20px);font:500 clamp(19px,4.2vw,26px)/2.3 var(--font-display);overflow-wrap:break-word}
+.slot{white-space:nowrap;display:inline-block;max-width:100%}
+.slot::after{font:800 .8em var(--font-body)}
+.slot.ok::after{content:" ✓";color:var(--p-ok)}
+.slot.bad::after{content:" ✗";color:var(--p-no)}
+.slot.empty::after{content:" ?";color:var(--p-warn)}
+.slot.missed::after{content:" !";color:var(--p-warn)}
+select.blank{appearance:none;-webkit-appearance:none;font:800 .8em/1.2 var(--font-body);color:#1F1A2B;
+  background:var(--p-select) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231F1A2B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right .55em center/.75em;
+  border:3px solid #1F1A2B;border-radius:.6em;padding:.2em 1.9em .2em .6em;max-width:100%;cursor:pointer;vertical-align:baseline;opacity:1}
+select.blank option{background:#fff;color:#1F1A2B}
+select.blank:disabled{opacity:1;-webkit-text-fill-color:#1F1A2B;cursor:default}
+.slot.ok select{background-color:var(--p-ok-bg);border-color:var(--p-ok)}
+.slot.bad select{background-color:var(--p-no-bg);border-color:var(--p-no);animation:shake .35s}
+.slot.empty select{background-color:var(--p-warn-bg);border-color:var(--p-warn)}
+.slot.missed select{background-color:var(--p-warn-bg);border-color:var(--p-warn);border-style:dashed}
+@keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+select.blank:focus-visible{outline:4px solid #0B63C9;outline-offset:2px}
+
+.msg{margin-top:14px;padding:10px 14px;border-radius:12px;font-weight:800}
+.msg:empty{display:none}
+.msg[data-k="warn"]{background:var(--warn-bg);color:var(--warn-fg)}
+.msg[data-k="bad"]{background:var(--bad-bg);color:var(--bad-fg)}
+.msg[data-k="good"]{background:var(--good-bg);color:var(--good-fg)}
+
+/* result */
+.result{margin-top:20px;background:var(--surface);border:3px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,26px);display:grid;gap:12px}
+.result h3{font:700 clamp(26px,5.5vw,36px)/1.1 var(--font-display)}
+.stars{display:flex;gap:6px;font-size:44px;line-height:1}
+.stars .on{color:var(--star);text-shadow:0 2px 0 var(--tile-ink)}
+.stars .off{color:var(--muted);opacity:.45}
+.super{justify-self:start;background:var(--lime);color:var(--tile-ink);border:3px solid var(--tile-ink);border-radius:999px;padding:3px 14px;font:700 17px var(--font-display)}
+.review summary{cursor:pointer;font:600 18px var(--font-display);margin-bottom:12px}
+.review .card{margin-top:12px}
+
+/* peek overlay */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(20,12,32,.82);overflow:auto;display:grid;align-items:start;justify-items:center;
+  padding-block:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.peek-wrap{width:min(780px,100%);display:grid;gap:12px}
+.peek-top{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#fff;font:600 clamp(20px,4vw,26px) var(--font-display)}
+.bar{height:14px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;border:2px solid #fff}
+.bar i{display:block;height:100%;width:100%;background:var(--yellow)}
+.confetti{position:fixed;top:-16px;width:10px;height:14px;z-index:60;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(720deg)}}
+/* marks + teacher screens */
+.field-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:14px 0}
+.field{display:grid;gap:4px;font-size:15px;color:var(--muted);min-width:0}
+.field input,.paste{font:700 18px var(--font-body);padding:10px 12px;border:3px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);width:100%;min-width:0}
+.paste{font-size:15px;line-height:1.5;min-height:130px;resize:vertical;margin-top:4px}
+.markrows{display:grid;gap:8px;margin:14px 0;padding:0;list-style:none}
+.markrows li{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:3px solid var(--line);border-radius:14px;padding:8px 14px}
+.markrows .mk{font:700 20px var(--font-display)}
+.tablewrap{overflow-x:auto;border:3px solid var(--line);border-radius:14px;background:var(--surface);margin-top:12px}
+table.marks{border-collapse:collapse;width:100%;min-width:600px;font-variant-numeric:tabular-nums}
+.marks th,.marks td{padding:8px 12px;text-align:left;border-bottom:2px solid var(--line)}
+.marks th{font:600 16px var(--font-display);background:var(--bg)}
+.marks td.num,.marks th.num{text-align:center}
+.marks tr:last-child td{border-bottom:0}
+.warn{color:var(--warn-fg)}
+.clearable{display:flex;gap:6px;align-items:stretch}
+.clearable input{flex:1}
+.clr{appearance:none;-webkit-appearance:none;border:3px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:0 14px;min-width:48px;font:700 18px var(--font-body);cursor:pointer}
+.fixed{font:700 18px var(--font-body);padding:10px 12px;border:3px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.stamp[disabled]{cursor:default;border-style:solid;opacity:.9}
+.stamp[disabled]:hover{border-color:var(--line)}
+/* who + report card */
+.who{background:var(--surface);border:3px solid var(--line);border-radius:22px;padding:clamp(14px,3vw,24px);margin-bottom:18px}
+.who h2{font:700 clamp(24px,5vw,32px)/1.1 var(--font-display)}
+.who .field-row{margin:12px 0 0}
+.report{background:var(--paper);color:var(--paper-ink);border:4px solid var(--paper-ink);border-radius:18px 10px 20px 12px/12px 20px 10px 18px;padding:clamp(14px,4vw,22px);max-width:560px;box-shadow:6px 6px 0 var(--shadow);display:grid;gap:8px}
+.rep-top{display:flex;justify-content:space-between;gap:4px 12px;flex-wrap:wrap;align-items:baseline;border-bottom:3px dashed var(--paper-ink);padding-bottom:8px}
+.rep-title{font:700 clamp(22px,5vw,28px)/1.1 var(--font-display)}
+.rep-date{font-size:15px}
+.rep-name{font:700 clamp(26px,7vw,36px)/1.1 var(--font-display);overflow-wrap:anywhere}
+.rep-blank{opacity:.55;font-weight:600}
+.rep-class{font:600 20px/1.2 var(--font-display)}
+.rep-rows{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:8px}
+.rep-rows li{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px;border:3px solid var(--paper-ink);border-radius:14px;padding:6px 10px}
+.art-wrap.sm{width:44px;height:44px;border-width:2px}
+.rep-c{font:700 20px var(--font-display);min-width:0}
+.rep-m{font:700 22px var(--font-display);font-variant-numeric:tabular-nums}
+.rep-np{font-size:14px;opacity:.65}
+.report .stars{font-size:22px;gap:2px}
+.report .stars .off{color:#8D869C}
+.rep-total{font:600 22px/1.3 var(--font-display);border-top:3px dashed var(--paper-ink);padding-top:8px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.btn{transition:none}}
+</style>
+
+<div class="wrap">
+  <main id="app"></main>
+</div>
+<div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Peek at the postcard" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var PEEK_SECONDS = 20;
+var TC = ['yellow','pink','lime','sky','orange','violet'];
+var COUNTRIES = [
+  { id:'japan', name:'Japan', color:'lime',
+    parts:["We can visit the charming 17th ",{a:"century"}," palaces in Japan such as the Nijo Palace. It’s the ",{a:"only"}," palace in Japan to have been built at ",{a:"ground"}," level. We can also visit ",{a:"Arashiyama"}," which consists of bamboo groves, Togetsukyo ",{a:"bridge"}," and boating in the Oigawa river."],
+    extra:["castle","river","first"] },
+  { id:'turkey', name:'Turkey', color:'pink',
+    parts:["We must visit the Hagia Sophia Museum to get ",{a:"know"}," its beautiful history as a church and ",{a:"mosque"},". Then, we can also visit the Spice Bazaar that has more than just ",{a:"spices"}," such as desserts, food, ",{a:"perfume"}," and fragrant oils. We can also try the hot air ",{a:"balloons"}," in Goreme Valley."],
+    extra:["learn","temple","kites"] },
+  { id:'singapore', name:'Singapore', color:'yellow',
+    parts:["We can spend some time in ",{a:"Sentosa Island"}," with many activities such as visiting the ",{a:"famous"}," Merlion statue, SEA aquarium and the ",{a:"amazing"}," Universal Studios. We must also visit ",{a:"Gardens"}," by the Bay which ",{a:"highlights"}," many types of plants."],
+    extra:["giant","Parks","shows"] },
+  { id:'thailand', name:'Thailand', color:'sky',
+    parts:["We can visit the Floating Market where we can ",{a:"jump"}," in a boat and enjoy the variety local food ",{a:"offered"},". We can also do ",{a:"island"}," hopping as there are many islands and amazing ",{a:"things"}," to enjoy. Grand Palace is also one of the main ",{a:"attractions"}," in Thailand."],
+    extra:["sit","sold","places"] }
+];
+function cmp(a,b){ return a.localeCompare(b,'en',{sensitivity:'base'}); }
+COUNTRIES.forEach(function(c){
+  var words = c.parts.filter(function(p){return typeof p!=='string';}).map(function(p){return p.a;});
+  c.answers = [c.name].concat(words);
+  c.bank = words.concat(c.extra).sort(cmp);
+});
+var COUNTRY_NAMES = COUNTRIES.map(function(c){return c.name;}).sort(cmp);
+
+var store = {
+  get:function(k,d){ try{ var v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+var cfg = {peeks:1,tries:2};
+var MAX_PLAYS = 1;
+function locked(id){ var p=prog[id]; return !!p && (p.plays||1)>=MAX_PLAYS; }
+var prog = store.get('hol-prog',{});
+var S = null;
+var peekTimer = null;
+var app = document.getElementById('app');
+var overlay = document.getElementById('overlay');
+function $(s){ return document.querySelector(s); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function byId(id){ return COUNTRIES.filter(function(c){return c.id===id;})[0]; }
+function cur(){ return byId(S.cid); }
+function plural(n,w){ return n+' '+w+(n===1?'':'s'); }
+
+/* ---------- marks page (pupils screenshot it and upload to Google Classroom) ---------- */
+var CLASS_NAME = '2 Gemilang';
+var pupil = {name:String((store.get('hol-pupil',{})||{}).name||'')};
+function clean(s){ return String(s||'').replace(/\s+/g,' ').trim().slice(0,40); }
+function fields(){
+  return '<div class="field-row"><label class="field" for="pupil-name">My name<input id="pupil-name" maxlength="40" autocomplete="off" placeholder="Type your name" value="'+esc(pupil.name)+'"></label>'
+    +'<div class="field">My class<div class="fixed">'+CLASS_NAME+'</div></div></div>';
+}
+function cardMarks(){
+  var name=clean(pupil.name), cls=CLASS_NAME;
+  var played=COUNTRIES.filter(function(c){return prog[c.id];});
+  var total=played.reduce(function(a,c){return a+prog[c.id].correct;},0);
+  var max=played.reduce(function(a,c){return a+c.answers.length;},0);
+  var date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  return '<article class="report" id="report"><div class="rep-top"><span class="rep-title">Going on a Holiday</span><span class="rep-date">'+esc(date)+'</span></div>'
+    +'<p class="rep-name">'+(name?esc(name):'<span class="rep-blank">Type your name above</span>')+'</p>'
+    +'<p class="rep-class">'+(cls?esc(cls):'<span class="rep-blank">Type your class above</span>')+'</p>'
+    +'<ul class="rep-rows">'+COUNTRIES.map(function(c){
+        var p=prog[c.id];
+        return '<li><span class="art-wrap sm">'+art(c.id)+'</span><span class="rep-c">'+c.name+'</span>'
+          +'<span class="rep-m">'+(p? p.correct+'/'+c.answers.length : '–')+'</span>'
+          +(p? stars(p.stars) : '<span class="rep-np">not played</span>')+'</li>';
+      }).join('')+'</ul>'
+    +'<p class="rep-total">'+(played.length? 'Total <b>'+total+'/'+max+'</b> · '+played.length+' of '+COUNTRIES.length+' countries' : 'Play a country to get your marks')+'</p></article>';
+}
+function updateCard(){ var s=$('#reportslot'); if(s) s.innerHTML=cardMarks(); }
+
+/* ---------- download the marks card as a picture ---------- */
+var dlCap = null;
+function marksHint(){
+  return dlCap
+    ? 'Check your name. Press Download, then upload the picture to Google Classroom. You can also take a screenshot of the card.'
+    : 'Check your name. Then take a screenshot of the card and upload it to Google Classroom.';
+}
+try{
+  if(window.claude && window.claude.use){
+    window.claude.use('downloads').then(function(d){
+      dlCap = d || null;
+      var b=$('#dlbtn'), h=$('#marks-hint');
+      if(b) b.hidden = !dlCap;
+      if(h) h.textContent = marksHint();
+    }).catch(function(){});
+  }
+}catch(e){}
+function loadSvg(id){
+  return new Promise(function(res){
+    var svg=art(id).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" ');
+    var im=new Image();
+    im.onload=function(){ res(im); };
+    im.onerror=function(){ res(null); };
+    im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  });
+}
+function rr(x,px,py,w,h,r){
+  x.beginPath(); x.moveTo(px+r,py);
+  x.arcTo(px+w,py,px+w,py+h,r); x.arcTo(px+w,py+h,px,py+h,r); x.arcTo(px,py+h,px,py,r); x.arcTo(px,py,px+w,py,r);
+  x.closePath();
+}
+function drawCard(){
+  var D="Fredoka,'Trebuchet MS','Comic Sans MS',sans-serif", B="Nunito,'Trebuchet MS',Verdana,sans-serif";
+  var fontsReady = (document.fonts && document.fonts.load)
+    ? Promise.all([document.fonts.load('700 56px Fredoka'),document.fonts.load('600 44px Fredoka'),document.fonts.load('700 30px Nunito')]).catch(function(){})
+    : Promise.resolve();
+  return Promise.all([fontsReady].concat(COUNTRIES.map(function(c){ return loadSvg(c.id); }))).then(function(r){
+    var imgs=r.slice(1), W=1080, H=1060, ink='#1F1A2B';
+    var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+    var x=cv.getContext('2d');
+    x.fillStyle='#FFEEF5'; x.fillRect(0,0,W,H);
+    x.fillStyle='#FFFFFF'; rr(x,40,40,W-80,H-80,40); x.fill();
+    x.lineWidth=8; x.strokeStyle=ink; x.stroke();
+    var L=88, R=W-88, name=clean(pupil.name), cls=CLASS_NAME;
+    var date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+    x.fillStyle=ink; x.textBaseline='alphabetic'; x.textAlign='left';
+    x.font='700 56px '+D; x.fillText('Going on a Holiday',L,128);
+    x.font='700 30px '+B; x.textAlign='right'; x.fillText(date,R,126); x.textAlign='left';
+    x.lineWidth=5; x.setLineDash([16,12]); x.beginPath(); x.moveTo(L,160); x.lineTo(R,160); x.stroke();
+    var size=84; x.font='700 '+size+'px '+D;
+    while(x.measureText(name).width>R-L && size>36){ size-=4; x.font='700 '+size+'px '+D; }
+    x.fillText(name,L,262);
+    x.font='600 44px '+D; x.fillText(cls,L,322);
+    var y=356, rowH=118, gap=16, got=0, max=0, played=0;
+    COUNTRIES.forEach(function(c,i){
+      var p=prog[c.id], ry=y+i*(rowH+gap), cx=L+16+43, cy=ry+rowH/2;
+      x.setLineDash([]); x.lineWidth=6; x.strokeStyle=ink; rr(x,L,ry,R-L,rowH,28); x.stroke();
+      x.save(); x.beginPath(); x.arc(cx,cy,43,0,Math.PI*2); x.clip();
+      if(imgs[i]) x.drawImage(imgs[i],cx-43,cy-43,86,86); else { x.fillStyle='#EEEEEE'; x.fillRect(cx-43,cy-43,86,86); }
+      x.restore();
+      x.lineWidth=4; x.strokeStyle=ink; x.beginPath(); x.arc(cx,cy,43,0,Math.PI*2); x.stroke();
+      x.fillStyle=ink; x.textAlign='left';
+      x.font='700 44px '+D; x.fillText(c.name,L+130,cy+15);
+      x.font='700 48px '+D; x.fillText(p? p.correct+'/'+c.answers.length : '–', L+480, cy+17);
+      if(p){
+        got+=p.correct; max+=c.answers.length; played++;
+        x.font='700 52px '+B;
+        for(var s=0;s<3;s++){
+          var sx=L+620+s*62;
+          if(s<p.stars){ x.lineWidth=4; x.strokeStyle=ink; x.strokeText('★',sx,cy+18); x.fillStyle='#FFB800'; x.fillText('★',sx,cy+18); }
+          else { x.fillStyle='#8D869C'; x.fillText('★',sx,cy+18); }
+        }
+      } else { x.font='600 30px '+B; x.fillStyle='#6B6478'; x.fillText('not played',L+620,cy+10); }
+    });
+    x.setLineDash([16,12]); x.lineWidth=5; x.strokeStyle=ink; x.beginPath(); x.moveTo(L,918); x.lineTo(R,918); x.stroke(); x.setLineDash([]);
+    x.fillStyle=ink; x.font='600 48px '+D;
+    x.fillText('Total '+got+'/'+max+' · '+played+' of '+COUNTRIES.length+' countries',L,984);
+    return cv;
+  });
+}
+function downloadMarks(){
+  var name=clean(pupil.name);
+  if(!name){ say('warn','Type your name first, then press Download.'); var n=$('#pupil-name'); if(n) n.focus(); return; }
+  if(!Object.keys(prog).length){ say('warn','Play at least one country first.'); return; }
+  if(!dlCap){ say('warn','Download is not available here. Please take a screenshot of the card instead.'); return; }
+  var btn=$('#dlbtn'); if(btn) btn.disabled=true;
+  drawCard().then(function(cv){
+    return new Promise(function(res,rej){ cv.toBlob(function(bl){ if(bl) res(bl); else rej(new Error('no image')); },'image/png'); });
+  }).then(function(bl){
+    var fn=(name.replace(/[^A-Za-z0-9 \-]/g,'').trim().replace(/\s+/g,'-')||'my')+'-Going-on-a-Holiday-marks.png';
+    return dlCap.save({filename:fn,data:bl});
+  }).then(function(){
+    say('good','Saved! Now upload the picture to Google Classroom.');
+  }).catch(function(err){
+    say('warn', err && err.code==='declined' ? 'Download cancelled. Press the button to try again.' : 'Could not download. Please take a screenshot of the card instead.');
+  }).then(function(){ if(btn) btn.disabled=false; });
+}
+function marks(){
+  closePeek(); S=null;
+  app.innerHTML =
+   '<div class="topbar"><button class="back" data-act="home">← Passport</button></div>'
+   +'<h2 class="screen-title">My marks</h2>'
+   +'<p class="hint" id="marks-hint">'+marksHint()+'</p>'
+   +fields()
+   +'<div id="reportslot">'+cardMarks()+'</div>'
+   +'<p class="msg" id="msg" role="status" aria-live="polite"></p>'
+   +'<div class="actions"><button class="btn good" data-act="download" id="dlbtn"'+(dlCap?'':' hidden')+'>Download my marks</button>'
+   +'</div>';
+  window.scrollTo(0,0);
+}
+
+/* ---------- little illustrations ---------- */
+function art(id){
+  var k='#1F1A2B', o='stroke="'+k+'" stroke-width="2.5" stroke-linejoin="round"';
+  var s='<svg viewBox="0 0 120 120" aria-hidden="true">';
+  if(id==='japan'){
+    s+='<rect width="120" height="120" fill="#EBFCC8"/>'
+     +'<circle cx="30" cy="30" r="14" fill="#FF4B4B" '+o+'/>'
+     +'<rect x="0" y="92" width="120" height="28" fill="#22C7F5"/>'
+     +'<path d="M8 104h24M48 110h28M92 104h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+    [90,102,114].forEach(function(x){
+      s+='<rect x="'+x+'" y="-4" width="8" height="98" fill="#4CC03B" '+o+'/>'
+       +'<path d="M'+x+' 28h8M'+x+' 56h8M'+x+' 78h8" stroke="'+k+'" stroke-width="2.5"/>';
+    });
+    s+='<rect x="2" y="76" width="82" height="7" rx="2" fill="#B8602B" '+o+'/>'
+     +'<path d="M12 83v14M40 83v14M70 83v14" stroke="'+k+'" stroke-width="4" stroke-linecap="round"/>'
+     +'<path d="M8 76V62M30 76V62M52 76V62M76 76V62M6 63h72" stroke="#D43A22" stroke-width="3.5" stroke-linecap="round"/>';
+  } else if(id==='turkey'){
+    s+='<rect width="120" height="120" fill="#FFD6EA"/>';
+    [['10,122 28,72 46,122'],['38,122 62,58 86,122'],['78,122 96,78 114,122']].forEach(function(p){
+      s+='<polygon points="'+p[0]+'" fill="#F2C46B" '+o+'/>';
+    });
+    s+='<path d="M24 122v-10a4 4 0 0 1 8 0v10zM58 122v-12a4 4 0 0 1 8 0v12z" fill="#7A4B22"/>';
+    [[32,34,16,'#FF4B4B'],[66,24,14,'#FFD21F'],[94,42,15,'#22C7F5']].forEach(function(b){
+      s+='<circle cx="'+b[0]+'" cy="'+b[1]+'" r="'+b[2]+'" fill="'+b[3]+'" '+o+'/>'
+       +'<ellipse cx="'+b[0]+'" cy="'+b[1]+'" rx="5" ry="'+b[2]+'" fill="#fff" opacity=".65"/>'
+       +'<path d="M'+(b[0]-6)+' '+(b[1]+b[2]-1)+'l3 10M'+(b[0]+6)+' '+(b[1]+b[2]-1)+'l-3 10" stroke="'+k+'" stroke-width="2"/>'
+       +'<rect x="'+(b[0]-4)+'" y="'+(b[1]+b[2]+9)+'" width="8" height="6" fill="#B8602B" '+o+'/>';
+    });
+  } else if(id==='singapore'){
+    s+='<rect width="120" height="120" fill="#FFF1B0"/>'
+     +'<rect y="98" width="120" height="22" fill="#22C7F5"/>'
+     +'<path d="M8 108h22M46 112h26M88 108h22" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+    [[29,52,'M6 56Q29 26 52 56Z'],[62,30,'M38 34Q62 2 86 34Z'],[98,62,'M80 66Q98 40 116 66Z']].forEach(function(t){
+      s+='<rect x="'+(t[0]-4)+'" y="'+t[1]+'" width="8" height="'+(100-t[1])+'" fill="#8B5CF6" '+o+'/>'
+       +'<path d="'+t[2]+'" fill="#2FBF71" '+o+'/>'
+       +'<circle cx="'+(t[0]-8)+'" cy="'+(t[1]-2)+'" r="2.6" fill="#FF4FA3"/><circle cx="'+(t[0]+9)+'" cy="'+(t[1]-3)+'" r="2.6" fill="#FFD21F"/>';
+    });
+  } else {
+    s+='<rect width="120" height="120" fill="#CDF1FD"/>'
+     +'<path d="M34 14l9 24H25z" fill="#FFC21A" '+o+'/><path d="M34 32l16 28H18z" fill="#FFC21A" '+o+'/><path d="M34 52l22 32H12z" fill="#FFC21A" '+o+'/>'
+     +'<rect x="10" y="84" width="48" height="8" fill="#E8423F" '+o+'/>'
+     +'<rect y="98" width="120" height="22" fill="#22C7F5"/>'
+     +'<path d="M62 94h52q-6 14-20 14H80Q68 108 62 94z" fill="#FF9A1F" '+o+'/>'
+     +'<path d="M70 94l20-24 20 24z" fill="#E8423F" '+o+'/>'
+     +'<path d="M6 110h22M96 114h18" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+  }
+  return s+'</svg>';
+}
+
+/* ---------- pieces ---------- */
+function stars(n){
+  var h='<span class="stars" role="img" aria-label="'+n+' of 3 stars">';
+  for(var i=0;i<3;i++) h+='<span class="'+(i<n?'on':'off')+'" aria-hidden="true">★</span>';
+  return h+'</span>';
+}
+function cardHTML(c){
+  var text = c.parts.map(function(p){ return esc(typeof p==='string'?p:p.a); }).join('');
+  return '<article class="card" style="--c:var(--'+c.color+')"><div class="card-inner">'
+    +'<div class="card-head"><div class="art-wrap">'+art(c.id)+'</div><h3>'+esc(c.name.toUpperCase())+'</h3></div>'
+    +'<p class="card-text">'+text+'</p></div></article>';
+}
+function selectHTML(i,opts,total){
+  return '<span class="slot"><select class="blank" id="b'+i+'" data-i="'+i+'" aria-label="Blank '+(i+1)+' of '+total+'">'
+    +'<option value="">choose…</option>'
+    +opts.map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('')
+    +'</select></span>';
+}
+function say(kind,text){ var m=$('#msg'); if(m){ m.dataset.k=kind; m.textContent=text; } }
+
+/* ---------- screens ---------- */
+function tiles(word,off){
+  return '<span class="word" aria-hidden="true">'+word.split('').map(function(ch,i){
+    return '<span class="tile" style="--t:var(--'+TC[(i+off)%TC.length]+')">'+ch+'</span>';
+  }).join('')+'</span>';
+}
+function home(){
+  closePeek(); S=null;
+  var done = COUNTRIES.filter(function(c){return prog[c.id]&&prog[c.id].done!==false;}).length;
+  var peekLine = cfg.peeks===0 ? 'The card hides for good.' : 'You may peek '+plural(cfg.peeks,'more time')+' for '+PEEK_SECONDS+' seconds.';
+  app.innerHTML =
+   '<section class="hero">'
+   +'<h1 class="title" aria-label="Going on a holiday">'+tiles('going',0)+'<span class="small" aria-hidden="true">on a</span>'+tiles('holiday',2)+'</h1>'
+   +'<p class="lead">Read the postcard. Remember the words. Fill in the blanks!</p></section>'
+   +'<ol class="steps">'
+   +'<li><span class="n">1</span><span>Read the postcard once. Take your time.</span></li>'
+   +'<li><span class="n">2</span><span>Press the button and the card hides. '+peekLine+'</span></li>'
+   +'<li><span class="n">3</span><span>Choose the missing words from the lists. You have '+plural(cfg.tries,'try')+'. You can play each country one time only.</span></li>'
+   +'</ol>'
+   +'<section class="who"><h2>Who is playing?</h2>'+fields()+'</section>'
+   +'<section class="passport"><div class="passport-head"><h2>My holiday passport</h2><span class="count">'+done+' of '+COUNTRIES.length+' countries stamped</span></div>'
+   +'<div class="stamps">'
+   +COUNTRIES.map(function(c){
+      var p=prog[c.id];
+      return '<button class="stamp" data-act="start" data-id="'+c.id+'" style="--c:var(--'+c.color+')"'+(locked(c.id)?' disabled':'')+'>'
+        +'<span class="art-wrap">'+art(c.id)+'</span><span class="s-name">'+c.name+'</span>'
+        +'<span class="s-state">'+(p? (p.done===false? 'Not finished \u00b7 '+p.correct+'/'+c.answers.length : '★'.repeat(p.stars)+'☆'.repeat(3-p.stars)+' · '+p.correct+'/'+c.answers.length) : 'Start the trip')+'</span>'
+        +(p&&p.done!==false?'<span class="badge">Stamped</span>':'')+'</button>';
+    }).join('')
+   +'</div><div class="actions"><button class="btn good" data-act="marks">See my marks</button></div></section>'
+   +'<p class="foot">Reading texts and dictation sheet by MissAsh.</p>';
+}
+function actHTML(){
+  return '<button class="btn" data-act="hide">I remember it! Hide the card</button>';
+}
+function read(id){
+  closePeek();
+  if(locked(id)){ home(); return; }
+  var c=byId(id);
+  S={cid:id,triesUsed:0,peeksLeft:cfg.peeks,peeksUsed:0,solved:c.answers.map(function(){return 0;}),over:false};
+  app.innerHTML =
+   '<div class="topbar"><button class="back" data-act="home">← Passport</button><div class="pills"><span class="pill">Step 1 of 2 · Read</span></div></div>'
+   +'<h2 class="screen-title">Postcard from '+esc(c.name)+'</h2>'
+   +'<p class="hint">Read slowly and remember the words. '+(cfg.peeks===0?'You will not see the card again.':'After you hide the card you can peek '+plural(cfg.peeks,'time')+'.')+'</p>'
+   +cardHTML(c)
+   +'<div class="actions" id="act">'+actHTML()+'</div>';
+  window.scrollTo(0,0);
+}
+function quiz(){
+  var c=cur(), total=c.answers.length, i=0;
+  var dict = c.parts.map(function(p){ return typeof p==='string'? esc(p) : selectHTML(++i,c.bank,total); }).join('');
+  app.innerHTML =
+   '<div class="topbar"><button class="back" data-act="home">← Passport</button><div class="pills"><span class="pill">Step 2 of 2 · Fill in</span><span class="pill" id="p-tries"></span><span class="pill" id="p-peeks"></span></div></div>'
+   +'<h2 class="screen-title">What do you remember?</h2>'
+   +'<p class="hint">Choose a word for every blank, then press Check. The card is hidden.</p>'
+   +'<section class="sheet"><div class="sheet-top"><div class="art-wrap">'+art(c.id)+'</div>'
+   +'<div class="q"><span>This postcard is from</span>'+selectHTML(0,COUNTRY_NAMES,total)+'</div></div>'
+   +'<p class="dict">'+dict+'</p></section>'
+   +'<p class="msg" id="msg" role="status" aria-live="polite"></p>'
+   +'<div class="actions" id="actions"><button class="btn" data-act="check">Check my answers</button>'
+   +(cfg.peeks>0?'<button class="btn alt" data-act="peek" id="peekbtn">Peek at the card</button>':'')+'</div>'
+   +'<div id="resultslot"></div>';
+  updatePills();
+  window.scrollTo(0,0);
+}
+function updatePills(){
+  var t=$('#p-tries'), p=$('#p-peeks'), b=$('#peekbtn');
+  if(t) t.textContent='Tries left: '+Math.max(0,cfg.tries-S.triesUsed);
+  if(p){ if(cfg.peeks>0) p.textContent='Peeks left: '+S.peeksLeft; else p.hidden=true; }
+  if(b){ b.disabled = S.peeksLeft<1 || S.over; b.textContent = S.peeksLeft<1 ? 'No peeks left' : 'Peek at the card ('+PEEK_SECONDS+' seconds)'; }
+}
+
+/* ---------- play ---------- */
+function confirmHide(){
+  $('#act').innerHTML='<p style="flex-basis:100%">Ready? The card will disappear'+(cfg.peeks>0?' (you can still peek '+plural(cfg.peeks,'time')+')':' and you cannot see it again')+'. After this the country counts for your marks, so finish it in one go.</p>'
+    +'<button class="btn good" data-act="confirm">Yes, hide the card</button><button class="btn ghost" data-act="keep">Keep reading</button>';
+  var b=$('#act .btn'); if(b) b.focus();
+}
+function hideCard(){
+  var o=prog[S.cid];
+  prog[S.cid]={correct:o?o.correct:0,stars:o?o.stars:0,plays:((o&&o.plays)||(o?1:0))+1,done:false};
+  store.set('hol-prog',prog);
+  var card=$('.card');
+  if(card) card.classList.add('leaving');
+  setTimeout(quiz, card?380:0);
+}
+function check(){
+  if(!S||S.over) return;
+  var c=cur();
+  var sels=[].slice.call(app.querySelectorAll('select.blank:not(:disabled)'));
+  var empty=sels.filter(function(s){return !s.value;});
+  if(empty.length){
+    empty.forEach(function(s){ s.parentElement.className='slot empty'; });
+    say('warn','Choose a word for every blank first. This did not use up a try.');
+    empty[0].focus();
+    return;
+  }
+  S.triesUsed++;
+  var wrong=0;
+  sels.forEach(function(s){
+    var i=+s.dataset.i, slot=s.parentElement;
+    if(s.value===c.answers[i]){ S.solved[i]=S.triesUsed; s.disabled=true; slot.className='slot ok'; }
+    else { wrong++; slot.className='slot bad'; }
+  });
+  updatePills();
+  if(wrong===0 || S.triesUsed>=cfg.tries){ finish(c); return; }
+  var left=cfg.tries-S.triesUsed;
+  say('bad', plural(wrong,'blank')+(wrong===1?' is':' are')+' not right yet. Fix '+(wrong===1?'it':'them')+' and check again. '+plural(left,'try')+' left'
+    +(S.peeksLeft>0?', and you can still peek at the card.':'.'));
+  var firstBad=app.querySelector('.slot.bad select'); if(firstBad) firstBad.focus();
+}
+function finish(c){
+  S.over=true;
+  var total=c.answers.length, correct=0;
+  [].slice.call(app.querySelectorAll('select.blank')).forEach(function(s){
+    var i=+s.dataset.i;
+    if(S.solved[i]) correct++;
+    else { s.value=c.answers[i]; s.disabled=true; s.parentElement.className='slot missed'; }
+  });
+  var st = correct===total?3 : correct>=total-2?2 : correct>=2?1:0;
+  var perfect = correct===total && S.solved.every(function(v){return v===1;}) && S.peeksUsed===0;
+  var old=prog[c.id]||{};
+  prog[c.id]={correct:correct,stars:st,plays:old.plays||1,done:true};
+  store.set('hol-prog',prog);
+  var canRetry=prog[c.id].plays<MAX_PLAYS;
+  var idx=COUNTRIES.indexOf(c), next=COUNTRIES.filter(function(k,j){ return j>idx && !prog[k.id]; })[0];
+  var head = correct===total?'Perfect! Your memory is amazing!' : st===2?'Great memory!' : st===1?'Good try!' : 'Keep practising!';
+  $('#msg').textContent='';
+  $('#actions').hidden=true;
+  $('#resultslot').innerHTML =
+    '<section class="result" tabindex="-1" id="result">'+stars(st)
+    +'<h3>'+head+'</h3>'
+    +'<p>You filled in '+correct+' of '+total+' blanks correctly.'+(correct<total?' The orange blanks show the right words.':'')+'</p>'
+    +(perfect?'<span class="super">✨ Super Memory: perfect, with no peeking</span>':'')
+    +'<details class="review"><summary>Read the postcard again</summary>'+cardHTML(c)+'</details>'
+    +'<div class="actions" style="margin-top:4px">'
+    +(next?'<button class="btn good" data-act="start" data-id="'+next.id+'">Next: '+next.name+'</button>':'')
+    +(canRetry?'<button class="btn alt" data-act="start" data-id="'+c.id+'">Try '+esc(c.name)+' again</button>':'')
+    +'<button class="btn" data-act="marks">See my marks</button>'
+    +'<button class="btn ghost" data-act="home">Passport</button></div></section>';
+  updatePills();
+  var r=$('#result'); if(r){ r.scrollIntoView({block:'start'}); r.focus({preventScroll:true}); }
+  if(st===3) confetti();
+}
+function peek(){
+  if(!S||S.over||S.peeksLeft<1) return;
+  S.peeksLeft--; S.peeksUsed++; updatePills();
+  var c=cur(), t=PEEK_SECONDS;
+  overlay.innerHTML='<div class="peek-wrap"><div class="peek-top"><span>Look fast! <b id="sec">'+t+'</b> s</span><button class="btn alt" data-act="closepeek">Close now</button></div>'
+    +'<div class="bar"><i id="barfill"></i></div>'+cardHTML(c)+'</div>';
+  overlay.hidden=false; overlay.scrollTop=0;
+  var fill=$('#barfill');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ fill.style.transition='width '+t+'s linear'; fill.style.width='0%'; }); });
+  clearInterval(peekTimer);
+  peekTimer=setInterval(function(){ t--; var s=$('#sec'); if(s) s.textContent=Math.max(t,0); if(t<=0) closePeek(); },1000);
+  var b=overlay.querySelector('button'); if(b) b.focus();
+}
+function closePeek(){
+  clearInterval(peekTimer);
+  if(overlay.hidden) return;
+  overlay.hidden=true; overlay.innerHTML='';
+  var b=$('#peekbtn'); if(b && !b.disabled) b.focus();
+}
+function confetti(){
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cols=['#FF4FA3','#B8F12B','#FFD21F','#22C7F5','#FF9A1F','#B36BFF'];
+  for(var i=0;i<36;i++){
+    var d=document.createElement('span'); d.className='confetti';
+    d.style.left=Math.random()*100+'vw'; d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(1.6+Math.random()*1.6)+'s'; d.style.animationDelay=(Math.random()*.5)+'s';
+    document.body.appendChild(d);
+    setTimeout((function(el){return function(){ el.remove(); };})(d),3800);
+  }
+}
+
+/* ---------- events ---------- */
+app.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b) return;
+  var a=b.dataset.act;
+  if(a==='start') read(b.dataset.id);
+  else if(a==='home') home();
+  else if(a==='hide') confirmHide();
+  else if(a==='keep'){ $('#act').innerHTML=actHTML(); }
+  else if(a==='confirm') hideCard();
+  else if(a==='check') check();
+  else if(a==='peek') peek();
+  else if(a==='marks') marks();
+  else if(a==='download') downloadMarks();
+});
+app.addEventListener('input',function(e){
+  var t=e.target;
+  if(t.id==='pupil-name'){ pupil.name=t.value; store.set('hol-pupil',pupil); updateCard(); }
+});
+overlay.addEventListener('click',function(e){ if(e.target.closest('[data-act="closepeek"]')) closePeek(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePeek(); });
+app.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.classList.contains('blank')){ if(t.parentElement.classList.contains('bad')||t.parentElement.classList.contains('empty')) t.parentElement.className='slot'; }
+});
+home();
+})();
+</script>
+
+</body></html>
